@@ -18,7 +18,7 @@ with open('data/driving_log.csv') as csvfile:
         lines.append(line)
 
 folder =  './data/IMG/'
-correction = 0.2
+correction = 0.3
 
 def generator(lines, batch_size=32):
     #make data generator
@@ -66,6 +66,7 @@ def generator(lines, batch_size=32):
 
 # compile and train the model using the generator function
 from sklearn.model_selection import train_test_split
+from keras.layers.advanced_activations import LeakyReLU
 train_samples, validation_samples = train_test_split(lines, test_size=0.3)
 train_generator = generator(train_samples, batch_size=32)
 validation_generator = generator(validation_samples, batch_size=32)
@@ -77,22 +78,31 @@ model = Sequential()
 #normalize input
 model.add(Lambda(lambda x: (x / 255.0) - 0.5, input_shape=input_shape))
 #remove top and bottom part of the image as they are not relevant for the training
-model.add(Cropping2D(cropping=((25,10),(0,0))))
+
+model.add(Cropping2D(cropping=((70,20),(0,0))))
 model.add( Convolution2D(24,5,5, subsample=(2,2), activation="relu") )
+model.add(LeakyReLU( alpha=0.3 ))
+model.add( Dropout(0.5) )
 model.add( Convolution2D(36,5,5, subsample=(2,2), activation="relu") )
+model.add(LeakyReLU( alpha=0.3 ))
 model.add( Convolution2D(48,5,5, subsample=(2,2), activation="relu") )
+model.add(LeakyReLU( alpha=0.3 ))
 model.add( Convolution2D(64,3,3,activation="relu") )
+model.add(LeakyReLU( alpha=0.3 ))
+model.add( Dropout(0.5) )
 model.add( Convolution2D(64,3,3,activation="relu") )
+model.add(LeakyReLU( alpha=0.3 ))
 model.add( Flatten() )
 model.add(Dense(100))
 model.add(Dense(50))
 model.add(Dense(10))
 model.add(Dense(1))
 
+
 model.compile(loss='mse', optimizer='adam')
 model.fit_generator(train_generator, samples_per_epoch=  len(train_samples),
                     validation_data=validation_generator, nb_val_samples=len(validation_samples),
-                    nb_epoch=4)
+                    nb_epoch=5 )
 
 model.save('model.h5')
 print('finished!')

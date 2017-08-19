@@ -85,7 +85,7 @@ My first step was to use a convolution neural network model just as what showed 
 
 But when To auto drive in unity3d car. it run bad on bridge. So I modified the model by make a generator . and make some process on data like add flip image,like make image a little correction as noise, to make it run better
 
-Then I add a dropout layer after the first convolution2D layer. but found it run worse. it always went out the road.So I threw it away~
+Then I add a dropout layer after the first convolution2D layer. but found it run worse. it always went out the road.So I threw it away.but after , I find if i add more eopchs , Dropout will make model better.so I finally add 2 Dropout layer.
 
 and after I change some Dense layer and use different data like collected from track1,track2.find out data from track2 run better.might because track2 is more complex.
 
@@ -103,10 +103,17 @@ Here is a visualization of the architecture (note: visualizing the architecture 
 | lambda         		| (x / 255.0) - 0.5		 						| 
 | Cropping2D         	| 160x320x3 ----->  125x320x3    				| 
 | Convolution 5x5     	| 32 5x5 filter, relu activation, subsample 2x2	|
+| LeakyReLU		     	|	0.5											|
+| Dropout		     	|	0.5											|
 | Convolution 5x5     	| 32 5x5 filter, relu activation, subsample 2x2	|
+| LeakyReLU		     	|	0.5											|
 | Convolution 5x5     	| 32 5x5 filter, relu activation, subsample 2x2	|
+| LeakyReLU		     	|	0.5											|
+| Dropout		     	|	0.5											|
 | Convolution 5x5     	| 64 3x3 filter, relu activation				|
+| LeakyReLU		     	|	0.5											|
 | Convolution 5x5     	| 64 3x3 filter, relu activation				|
+| LeakyReLU		     	|	0.5											|
 | Flatten				|									 			|
 | Dense					|	100	units						 			|
 | Dense					|	50	units									|
